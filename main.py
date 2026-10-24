@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 import dns.resolver
-
+import whois
 app = FastAPI(
     title="CyberForge AI",
     version="0.0.1"
@@ -32,3 +32,18 @@ def dns_lookup(domain: str):
         "domain": domain,
         "a_records": records
     }
+@app.get("/whois/{domain}")
+def whois_lookup(domain: str):
+
+    try:
+        data = whois.whois(domain)
+
+        return {
+            "domain": domain,
+            "registrar": str(data.registrar),
+            "creation_date": str(data.creation_date),
+            "expiration_date": str(data.expiration_date),
+        }
+
+    except Exception as e:
+        return {"error": str(e)}
