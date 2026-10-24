@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 import dns.resolver
 import whois
+import requests
 app = FastAPI(
     title="CyberForge AI",
     version="0.0.1"
@@ -43,6 +44,27 @@ def whois_lookup(domain: str):
             "registrar": str(data.registrar),
             "creation_date": str(data.creation_date),
             "expiration_date": str(data.expiration_date),
+        }
+
+    except Exception as e:
+        return {"error": str(e)}
+
+@app.get("/ip/{ip}")
+def ip_lookup(ip: str):
+
+    try:
+        response = requests.get(
+            f"http://ip-api.com/json/{ip}"
+        )
+
+        data = response.json()
+
+        return {
+            "ip": ip,
+            "country": data.get("country"),
+            "city": data.get("city"),
+            "isp": data.get("isp"),
+            "org": data.get("org")
         }
 
     except Exception as e:
