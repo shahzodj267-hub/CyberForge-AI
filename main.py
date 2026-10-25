@@ -1,11 +1,23 @@
 from fastapi import FastAPI
-import dns.resolver
-import whois
-import requests
+
+from app.routes.dns import router as dns_router
+from app.routes.whois import router as whois_router
+from app.routes.geoip import router as geoip_router
+from app.routes.subdomain import router as subdomain_router
+from app.routes.http import router as http_router
+from app.routes.ssl import router as ssl_router
+
 app = FastAPI(
     title="CyberForge AI",
     version="0.0.1"
 )
+
+app.include_router(dns_router)
+app.include_router(whois_router)
+app.include_router(geoip_router)
+app.include_router(subdomain_router)
+app.include_router(http_router)
+app.include_router(ssl_router)
 
 @app.get("/")
 def home():
@@ -14,58 +26,3 @@ def home():
         "status": "running"
     }
 
-
-@app.get("/dns/{domain}")
-def dns_lookup(domain: str):
-
-    records = []
-
-    try:
-        answers = dns.resolver.resolve(domain, "A")
-
-        for rdata in answers:
-            records.append(str(rdata))
-
-    except Exception as e:
-        return {"error": str(e)}
-
-    return {
-        "domain": domain,
-        "a_records": records
-    }
-@app.get("/whois/{domain}")
-def whois_lookup(domain: str):
-
-    try:
-        data = whois.whois(domain)
-
-        return {
-            "domain": domain,
-            "registrar": str(data.registrar),
-            "creation_date": str(data.creation_date),
-            "expiration_date": str(data.expiration_date),
-        }
-
-    except Exception as e:
-        return {"error": str(e)}
-
-@app.get("/ip/{ip}")
-def ip_lookup(ip: str):
-
-    try:
-        response = requests.get(
-            f"http://ip-api.com/json/{ip}"
-        )
-
-        data = response.json()
-
-        return {
-            "ip": ip,
-            "country": data.get("country"),
-            "city": data.get("city"),
-            "isp": data.get("isp"),
-            "org": data.get("org")
-        }
-
-    except Exception as e:
-        return {"error": str(e)}
