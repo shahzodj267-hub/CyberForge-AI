@@ -6,6 +6,9 @@ from app.routes.geoip import router as geoip_router
 from app.routes.subdomain import router as subdomain_router
 from app.routes.http import router as http_router
 from app.routes.ssl import router as ssl_router
+from app.routes.security_headers import (
+    router as security_headers_router
+)
 
 app = FastAPI(
     title="CyberForge AI",
@@ -18,6 +21,9 @@ app.include_router(geoip_router)
 app.include_router(subdomain_router)
 app.include_router(http_router)
 app.include_router(ssl_router)
+app.include_router(
+    security_headers_router
+)
 
 @app.get("/")
 def home():
