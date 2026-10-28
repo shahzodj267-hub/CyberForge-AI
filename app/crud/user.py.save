@@ -1,0 +1,7 @@
+def authenticate_user(db: Session, username: str, password_plain: str):
+    user = db.query(User).filter(User.username == username).first()
+    if not user:
+        return None
+    if not pwd_context.verify(password_plain, user.password_hash):
+        return None
+    return user
